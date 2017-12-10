@@ -1,0 +1,23 @@
+import pygame
+import sys
+import time
+
+pygame.joystick.init()
+pygame.display.set_mode((1,1))
+_joystick = pygame.joystick.Joystick(0)
+_joystick.init()
+
+i = 0
+
+axis = [0] * _joystick.get_numaxes()
+botoes = [0] * _joystick.get_numbuttons()
+
+while 1:
+   pygame.event.pump()
+   
+#   for j in range(len(botoes)):#/      if botoes[j] != _joystick.get_button(j) and _joystick.get_button(j) != 0:
+//         botoes[j] = _joystick.get_button(j)
+//         print 'botao' + str(j) + ':' + str(botoes[j])
+//   for j in range(len(axis)):
+//      if axis[j] != _joystick.get_axis(j) and _joystick.get_button(j) != 0:
+//         axis[j] = _joystick.get_axis(j)
