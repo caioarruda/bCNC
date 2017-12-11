@@ -115,7 +115,7 @@ _joystick.init()
 #==============================================================================
 class Application(Toplevel,Sender):
 	def __init__(self, master, **kw):
-		print "iniciou"
+		print("iniciou")
 		Toplevel.__init__(self, master, **kw)
 		Sender.__init__(self)
 		self.jogJoy()
@@ -2291,8 +2291,6 @@ class Application(Toplevel,Sender):
 				if event.button == 10:
 					self.unlock()
 			if event.type == 7:
-				print event.axis
-				print event.value
 				if event.axis == 4 and event.value > 0:
 					jogz = -1
 				else: 
