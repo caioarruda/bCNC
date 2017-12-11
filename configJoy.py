@@ -16,7 +16,7 @@ nomesEixosFuncoes = ["Movimentar X", "Movimentar Y","Movimentar Z"]
 botoes = [-1]*10
 eixos = [-1]*3
 direcs = [-1]*3
-arquivo = ""
+arquivo = "[controle]\r\n"
 
 def definirBotao(funcao, index):
 	global botoes
@@ -45,12 +45,7 @@ def definirEixo(funcao, index):
 				break
 			if event.type == 9:
 				print event.hat
-				flag = 0
-				direcs[index] = event.hat
-				pygame.event.clear()
-				time.sleep(1)
-				pygame.event.clear()
-				break
+				
 
 def lerControle():
 	print "Presione no controle e veja na tela:"
