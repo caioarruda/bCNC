@@ -73,6 +73,7 @@ from ControlPage  import ControlPage
 from TerminalPage import TerminalPage
 from ProbePage    import ProbePage
 from EditorPage   import EditorPage
+import ConfigParser
 
 _openserial = True	# override ini parameters
 _device     = None
@@ -100,24 +101,65 @@ FILETYPES = [	(_("All accepted"), ("*.ngc","*.nc", "*.tap", "*.gcode", "*.dxf", 
 posx=0
 posy=0
 posz=0
-jogx=0
-jogy=0
-jogz=0
+jogflagx=0
+jogflagy=0
+jogflagz=0
 
 geometry = None
 pygame.joystick.init()
 pygame.display.set_mode((1,1))
 _joystick = pygame.joystick.Joystick(0)
 _joystick.init()
-
+incstep=5
+decstep=4
+x0=2
+y0=3
+z0=0
+setfeed=1
+hold=8
+resume=7
+stop=10
+unlock=9
+jogx=0
+jogy=1
+jogz=3
 #==============================================================================
 # Main Application window
 #==============================================================================
 class Application(Toplevel,Sender):
 	def __init__(self, master, **kw):
-		print("iniciou")
+		global incstep
+		global decstep
+		global x0
+		global y0
+		global z0
+		global setfeed
+		global hold
+		global resume
+		global stop
+		global unlock
+		global jogx
+		global jogy
+		global jogz
 		Toplevel.__init__(self, master, **kw)
 		Sender.__init__(self)
+		configParser = ConfigParser.RawConfigParser()   
+		configFilePath = r'configJoy.ini'
+		configParser.read(configFilePath)
+		incstep=int(configParser.get('controle', 'incstep'))
+		decstep=int(configParser.get('controle', 'decstep'))
+		x0=int(configParser.get('controle', 'x0'))
+		y0=int(configParser.get('controle', 'y0'))
+		z0=int(configParser.get('controle', 'z0'))
+		setfeed=int(configParser.get('controle', 'setfeed'))
+		hold=int(configParser.get('controle', 'hold'))
+		resume=int(configParser.get('controle', 'resume'))
+		stop=int(configParser.get('controle', 'stop'))
+		unlock=int(configParser.get('controle', 'unlock'))
+		jogx=int(configParser.get('controle', 'jogx'))
+		jogy=int(configParser.get('controle', 'jogy'))
+		jogz=int(configParser.get('controle', 'jogz'))
+		
 		self.jogJoy()
 		if sys.platform == "win32":
 			self.iconbitmap("bCNC.ico")
@@ -2246,64 +2288,89 @@ class Application(Toplevel,Sender):
 		global jogx
 		global jogy
 		global jogz
+		global incstep
+		global decstep
+		global x0
+		global y0
+		global z0
+		global setfeed
+		global hold
+		global resume
+		global stop
+		global unlock
+		global jogflagx
+		global jogflagy
+		global jogflagz
 		posx = CNC.vars["wx"]
 		posy = CNC.vars["wy"]
 		posz = CNC.vars["wz"]
-		if jogy == 1:
+		if jogflagy == 1:
 			posy = posy + float(self.control.step.get())
 			self.sendGCode("G0Y"+str(posy))
-		if jogy == -1:
+		if jogflagy == -1:
 			posy = posy - float(self.control.step.get())
 			self.sendGCode("G0Y"+str(posy))
-		if jogx == 1:
+		if jogflagx == 1:
 			posx = posx + float(self.control.step.get())
 			self.sendGCode("G0X"+str(posx))
-		if jogx == -1:
+		if jogflagx == -1:
 			posx = posx - float(self.control.step.get())
 			self.sendGCode("G0X"+str(posx))
-		if jogz == 1:
+		if jogflagz == 1:
 			posz = posz + 1
 			self.sendGCode("G0Z"+str(posz))
-		if jogz == -1:
+		if jogflagz == -1:
 			posz = posz - 1
 			self.sendGCode("G0Z"+str(posz))
 
 		for event in pygame.event.get():
 			if event.type == 10: 
-				if event.button == 5:
+				if event.button == incstep:
 			 		self.control.incStep()
-				if event.button == 4:
+				if event.button == decstep:
 					self.control.decStep()
-				if event.button == 2:
+				if event.button == x0:
 					self.sendGCode("G92X0")
-				if event.button == 3:
+				if event.button == y0:
 					self.sendGCode("G92Y0")
-				if event.button == 0:
+				if event.button == z0:
 					self.sendGCode("G92Z0")
-				if event.button == 1:
+				if event.button == setfeed:
 					self.control.setStep(100)
-				if event.button == 6:
+				if event.button == hold:
 					self.feedHold()
-				if event.button == 7:
+				if event.button == resume:
 					self.resume()
-				if event.button == 10:
+				if event.button == stop:
 					self.stopRun()
-				if event.button == 10:
+				if event.button == unlock:
 					self.unlock()
 			if event.type == 7:
-				if event.axis == 4 and event.value > 0:
-					jogz = -1
+				if event.axis == jogx and event.value >= 1:
+					jogflagx = -1
 				else: 
-					if event.axis == 5 and event.value > 0:
-						jogz = 1
+					if event.axis == jogx and event.value <= -1:
+						jogflagx = 1
 					else:
-						if event.axis == 5 or event.axis == 4:
-							jogz = 0
-			if event.type == 9:
-				if event.hat == 0:
-					value = event.value
-					jogx = value[0]
-					jogy = value[1]
+						if event.axis == jogx:
+							jogflagx = 0
+				if event.axis == jogy and event.value >= 1:
+					jogflagy = -1
+				else: 
+					if event.axis == jogy and event.value <= -1:
+						jogflagy = 1				
+					else:
+						if event.axis == jogy:
+							jogflagy = 0
+				if event.axis == jogz and event.value >= 1:
+					jogflagz = -1
+				else: 
+					if event.axis == jogz and event.value <= -1:
+						jogflagz = 1
+					else:
+						if event.axis == jogz:
+							jogflagz = 0
+					
 		self.after(100,self.jogJoy)
 	#-----------------------------------------------------------------------
 	# Inner loop to catch any generic exception
@@ -2633,7 +2700,7 @@ if __name__ == "__main__":
 			  "\tor yum install python-serial\n" \
 			  "\tor dnf install python-pyserial"),
 			  parent=application)
-		if Updates.need2Check(): application.checkUpdates()
+		
 
 	if run:
 		application.run()
