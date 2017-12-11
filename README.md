@@ -7,19 +7,6 @@ An advanced fully featured g-code sender for GRBL. bCNC is a cross platform prog
 
 ![bCNC screenshot](https://raw.githubusercontent.com/vlachoudis/bCNC/doc/Screenshots/bCNC.png)
 
-# Installation
-You will need the following packages to run bCNC
-- tkinter the graphical toolkit for python
-  Depending your python/OS it can either be already installed,
-  or under the names tkinter, python-tkinter, python-tk
-- pyserial or under the name python-serial, python-pyserial
-- Optionally:
-- python-imaging-tk: the PIL libraries for autolevel height map
-- python-opencv: for webcam streaming on web pendant
-
-Expand the directory or download it from github
-and run the bCNC command
-
 # Configuration
 You can modify most of the parameters from the "Tools -> Machine"
 page. Only the changes/differences from the default configuration
